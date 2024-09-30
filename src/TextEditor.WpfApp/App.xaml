@@ -1,0 +1,11 @@
+﻿<Application x:Class="TextEditor.WpfApp.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:TextEditor.WpfApp"
+             xmlns:c="clr-namespace:TextEditor.WpfApp.Converters"
+             StartupUri="View\MainWindow.xaml">
+    <Application.Resources>
+        <BooleanToVisibilityConverter x:Key="boolToVisibility" />
+        <c:InverseBooleanConverter x:Key="inverseBoolean"/>
+    </Application.Resources>
+</Application>

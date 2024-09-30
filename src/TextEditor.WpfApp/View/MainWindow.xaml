@@ -1,0 +1,102 @@
+﻿<Window x:Class="TextEditor.WpfApp.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TextEditor.WpfApp"
+        mc:Ignorable="d"
+        Title="Text Editor" MinHeight="480" MinWidth="720" Height="480" Width="720">
+    <Grid Margin="4">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="150"/>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="3*" MinWidth="300"/>
+        </Grid.ColumnDefinitions>
+        <Border Margin="4">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Label Content="Открытые файлы:"/>
+                <ScrollViewer Grid.Row="1">
+                    <ListView x:Name="filesLv" ItemsSource="{Binding Files}" LostFocus="LvLostFocus"/>
+                </ScrollViewer>
+                <Button Grid.Row="2" Margin="0 4 0 0" Content="Открыть файл(ы)" Command="{Binding SelectFilesCommand}"/>
+            </Grid>
+            
+        </Border>
+        <GridSplitter Grid.Column="1" ShowsPreview="False" Width="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+        <Border Grid.Column="2" Margin="4">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Label Content="Файлы для редактирования:"/>
+                <ScrollViewer Grid.Row="1" Margin="0 0 0 4">
+                    <ListView x:Name="filesToEditLv" ItemsSource="{Binding FilesToEdit}" LostFocus="LvLostFocus"/>
+                </ScrollViewer>
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Параметры редактирования:"/>
+                            <StackPanel Margin="4">
+                                <CheckBox IsChecked="{Binding IsRemovePunctuations}" Content="Удалять знаки препинания" Margin="0 0 0 8"/>
+                                <CheckBox IsChecked="{Binding IsTruncate}">
+                                    <StackPanel>
+                                        <TextBlock Margin="0 0 0 4">
+                                            Удалять слова, которые короче<LineBreak/>
+                                            указанного кол-ва символов
+                                        </TextBlock>
+                                        <TextBox MaxLength="2" PreviewTextInput="MinWordLengthTextBoxPreviewTextInput" Text="{Binding MinWordLength}" Visibility="{Binding IsTruncate, Converter={StaticResource boolToVisibility}}"/>
+                                    </StackPanel>
+                                </CheckBox>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Выходной файл:"/>
+                            <StackPanel Margin="4">
+                                <TextBlock Margin="0 0 0 8" Text="{Binding OutputFile}" TextWrapping="Wrap"/>
+                                <Grid Margin="0 0 0 8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Content="Выбрать выходной файл" Margin="0 0 2 0" Command="{Binding SelectOutputFileCommand}"/>
+                                    <Button Grid.Column="1" Content="x" Command="{Binding RemoveOutputFileCommand}"
+                                            MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" 
+                                            MinHeight="{Binding ActualWidth, RelativeSource={RelativeSource Self}}"/>
+                                </Grid>
+                                <TextBlock FontSize="11" Foreground="Gray" TextWrapping="Wrap"
+                                   Text="По умолчанию файлы перезаписываются. Если выбрать выходной файл, изменения всех файлов запишутся в его конец."/>
+                                <TextBlock FontSize="11" Foreground="Red" TextWrapping="Wrap"
+                                   Text="Файлы будут редактироваться по очереди. Может занимать значительно больше времени."/>
+                            </StackPanel>
+                            
+                        </StackPanel>
+                    </Grid>
+                    <ProgressBar Grid.Row="1" Margin="0 0 0 4" Minimum="0" Maximum="100" Value="{Binding ExecutionProgress}" MinHeight="20" Visibility="{Binding IsFilesEditing, Converter={StaticResource boolToVisibility}}"/>
+                    <Button Grid.Row="2" Content="Редактировать файл(ы)" Command="{Binding EditFilesCommand}"/>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+    <Window.ContextMenu>
+        <ContextMenu>
+            <MenuItem Header="Переместить файл(ы)" Click="MoveFiles" IsEnabled="{Binding IsFilesEditing, Converter={StaticResource inverseBoolean}}"/>
+            <MenuItem Header="Убрать файл(ы)" Click="RemoveFiles" IsEnabled="{Binding IsFilesEditing, Converter={StaticResource inverseBoolean}}"/>
+        </ContextMenu>
+    </Window.ContextMenu>
+</Window>
